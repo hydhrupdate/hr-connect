@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Connect Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Mulish:wght@400;600;700&display=swap');
+:root{--ink:#111827;--green:#059669;--gl:#10b981;--gp:#d1fae5;--amber:#d97706;--ap:#fef3c7;--red:#dc2626;--rp:#fee2e2;--blue:#2563eb;--bp:#dbeafe;--pu:#7c3aed;--pp:#ede9fe;--sl:#64748b;--bd:#e5e7eb;--bg:#f8fafc}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Mulish,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+#app{min-height:100vh}
+.login-wrap{display:flex;min-height:100vh;background:var(--ink)}
+.login-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative}
+.login-bg{position:absolute;font-family:Syne,sans-serif;font-size:200px;font-weight:800;color:rgba(255,255,255,0.03);bottom:-20px;left:-10px;user-select:none}
+.login-right{width:460px;background:white;display:flex;align-items:center;justify-content:center;padding:48px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+.brand-icon{width:48px;height:48px;background:var(--green);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand-name{font-family:Syne,sans-serif;font-size:22px;font-weight:700;color:white}
+.brand-name em{color:#6ee7b7;font-style:normal}
+.tagline{font-family:Syne,sans-serif;font-size:48px;font-weight:800;color:white;line-height:1.1;margin-bottom:20px}
+.tagline em{color:#6ee7b7;font-style:normal}
+.tagdesc{color:rgba(255,255,255,0.4);font-size:15px;line-height:1.7;max-width:360px}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:28px}
+.pill{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600}
+.lf{width:100%}
+.lf h2{font-family:Syne,sans-serif;font-size:26px;font-weight:700;margin-bottom:4px}
+.lf p{color:var(--sl);font-size:14px;margin-bottom:24px}
+.rtabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:20px;border:1px solid var(--bd)}
+.rtab{flex:1;padding:9px;border:none;background:transparent;font-family:Mulish,sans-serif;font-size:13px;font-weight:700;color:var(--sl);border-radius:8px;cursor:pointer;transition:all 0.2s}
+.rtab.on{background:var(--ink);color:white}
+.flabel{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--sl);margin-bottom:6px}
+.finp{width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:9px;font-family:Mulish,sans-serif;font-size:14px;color:var(--ink);outline:none;background:var(--bg);margin-bottom:14px;transition:border-color 0.2s}
+.finp:focus{border-color:var(--green);background:white}
+.lbtn{width:100%;padding:13px;background:var(--ink);border:none;border-radius:9px;color:white;font-family:Syne,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.2s;margin-top:4px}
+.lbtn:hover{background:var(--green)}
+.lbtn:disabled{background:var(--sl);cursor:not-allowed}
+.lerr{color:var(--red);font-size:13px;margin-top:10px;display:none;background:var(--rp);padding:8px;border-radius:7px;text-align:center}
+.dbst{font-size:11px;margin-top:10px;text-align:center;padding:5px;border-radius:6px;background:#f1f5f9;color:var(--sl)}
+.dash{display:none}
+.topbar{background:var(--ink);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.tb-brand{font-family:Syne,sans-serif;font-size:17px;font-weight:700;color:white;display:flex;align-items:center;gap:8px}
+.tb-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.tb-r{display:flex;align-items:center;gap:12px}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:700;font-size:11px;color:white}
+.tbname{color:rgba(255,255,255,0.8);font-size:13px;font-weight:600}
+.tbbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase}
+.bhr{background:#6ee7b7;color:var(--ink)}
+.bas{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)}
+.bmg{background:#fbbf24;color:var(--ink)}
+.tblout{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:5px 13px;border-radius:7px;font-family:Mulish,sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
+.tblout:hover{background:rgba(255,255,255,0.12);color:white}
+.layout{display:flex;max-width:1080px;margin:0 auto;padding:28px 18px;gap:20px}
+.sidebar{width:210px;flex-shrink:0}
+.smenu{background:white;border-radius:14px;padding:7px;border:1px solid var(--bd);position:sticky;top:74px}
+.mi{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:9px;font-size:13px;font-weight:600;color:var(--sl);cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left}
+.mi:hover{background:var(--bg);color:var(--ink)}
+.mi.on{background:var(--ink);color:white}
+.mdiv{height:1px;background:var(--bd);margin:5px 0}
+.main{flex:1;min-width:0}
+.card{background:white;border-radius:14px;border:1px solid var(--bd);padding:22px;margin-bottom:18px;animation:fu 0.35s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ct{font-family:Syne,sans-serif;font-size:16px;font-weight:700;margin-bottom:16px}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--sl);margin-bottom:5px}
+.fi,.ft,.fs{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:8px;font-family:Mulish,sans-serif;font-size:14px;color:var(--ink);outline:none;background:var(--bg);transition:border-color 0.2s}
+.fi:focus,.ft:focus,.fs:focus{border-color:var(--green);background:white}
+.ft{min-height:95px;resize:vertical}
+.fr{display:flex;gap:9px}
+.fr .fld{flex:1}
+.btn{padding:9px 18px;border-radius:8px;font-family:Syne,sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.bp2{background:var(--ink);color:white}
+.bp2:hover{background:var(--green)}
+.bg2{background:var(--green);color:white}
+.bg2:hover{background:var(--gl)}
+.bsm{padding:5px 11px;font-size:11px}
+.bgh{background:var(--bg);color:var(--sl);border:1px solid var(--bd)}
+.bgh:hover{background:var(--bd)}
+.bdr{background:var(--rp);color:var(--red)}
+.bdr:hover{background:var(--red);color:white}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.trow,.vrow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tchip,.vchip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--bd);background:white;cursor:pointer;transition:all 0.15s;color:var(--sl)}
+.tchip.on{border-color:var(--green);background:var(--gp);color:var(--green)}
+.vchip.on{border-color:var(--blue);background:var(--bp);color:var(--blue)}
+.uc{background:white;border-radius:13px;border:1px solid var(--bd);padding:18px;margin-bottom:12px;transition:all 0.2s;animation:fu 0.3s ease both}
+.uc:hover{border-color:#d1d5db;box-shadow:0 3px 16px rgba(17,24,39,0.06);transform:translateY(-1px)}
+.uctop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.ucmeta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.utag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.ta{background:var(--gp);color:var(--green)}
+.tp{background:var(--ap);color:var(--amber)}
+.te{background:var(--bp);color:var(--blue)}
+.tr2{background:var(--rp);color:var(--red)}
+.tg{background:#f1f5f9;color:var(--sl)}
+.uvis{font-size:10px;font-weight:600;color:var(--sl);background:#f1f5f9;padding:2px 8px;border-radius:20px}
+.udate{font-size:11px;color:var(--sl)}
+.utitle{font-family:Syne,sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.ubody{font-size:13px;color:#4b5563;line-height:1.7;white-space:pre-wrap}
+.ufoot{margin-top:12px;padding-top:10px;border-top:1px solid var(--bd);font-size:11px;color:var(--sl);display:flex;justify-content:space-between}
+.pc{background:white;border-radius:13px;border:1.5px solid var(--bp);padding:18px;margin-bottom:12px;animation:fu 0.3s ease both}
+.pbadge{display:inline-flex;background:var(--bp);color:var(--blue);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;margin-bottom:8px;text-transform:uppercase}
+.pq{font-family:Syne,sans-serif;font-size:15px;font-weight:700;margin-bottom:12px}
+.pob{width:100%;padding:10px 14px;border:1.5px solid var(--bd);border-radius:9px;background:var(--bg);font-family:Mulish,sans-serif;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;transition:all 0.15s;margin-bottom:7px;display:block}
+.pob:hover{border-color:var(--blue);background:var(--bp);color:var(--blue)}
+.pres{margin-bottom:9px}
+.prl{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px}
+.pbb{height:7px;background:var(--bd);border-radius:10px;overflow:hidden}
+.pbf{height:100%;background:var(--green);border-radius:10px;transition:width 0.5s}
+.pfoot{margin-top:10px;font-size:11px;color:var(--sl);display:flex;justify-content:space-between;align-items:center}
+.at{width:100%;border-collapse:collapse}
+.at th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--sl);padding:7px 10px;border-bottom:1.5px solid var(--bd)}
+.at td{padding:11px 10px;font-size:12px;border-bottom:1px solid rgba(229,231,235,0.6);vertical-align:middle}
+.at tr:last-child td{border-bottom:none}
+.sdot{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.sact{background:var(--gp);color:var(--green)}
+.sinact{background:#f1f5f9;color:var(--sl)}
+.gbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--pp);color:var(--pu)}
+.abts{display:flex;gap:5px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.ptitle{font-family:Syne,sans-serif;font-size:20px;font-weight:800}
+.fr2{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.fpill{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--bd);background:white;color:var(--sl);transition:all 0.15s}
+.fpill.on{background:var(--ink);color:white;border-color:var(--ink)}
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sc{background:white;border-radius:13px;border:1px solid var(--bd);padding:16px 18px;animation:fu 0.3s ease both}
+.sv{font-family:Syne,sans-serif;font-size:30px;font-weight:800;line-height:1;margin-bottom:3px}
+.sl2{font-size:11px;color:var(--sl);font-weight:600}
+.por{display:flex;gap:7px;margin-bottom:7px;align-items:center}
+.ro{background:none;border:none;color:var(--red);font-size:17px;cursor:pointer;flex-shrink:0}
+.empty{text-align:center;padding:44px 20px;color:var(--sl)}
+.ei{font-size:40px;margin-bottom:10px}
+.et{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.es{font-size:12px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:white;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;display:none}
+@media(max-width:700px){.login-left{display:none}.login-right{width:100%}.layout{flex-direction:column;padding:14px}.sidebar{width:100%}.smenu{display:flex;overflow-x:auto;gap:3px;position:static}.sr{grid-template-columns:repeat(2,1fr)}.fr{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="app"><p style="font-family:sans-serif;padding:40px;text-align:center">Loading... If this persists, please refresh.</p></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore,collection,doc,addDoc,getDocs,updateDoc,deleteDoc,query,orderBy,onSnapshot,serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firestore.js';
+
+const FC = {apiKey:"AIzaSyA-5I3dKQnFaYF0I1tOUyYcRP-mhgEBlW0",authDomain:"hr-connect-3c286.firebaseapp.com",projectId:"hr-connect-3c286",storageBucket:"hr-connect-3c286.firebasestorage.app",messagingSenderId:"415534691338",appId:"1:415534691338:web:0cad0e7f1c6fbaca375bf3"};
+const app = initializeApp(FC);
+const db = getFirestore(app);
+
+const S = {user:null,assocs:[],updates:[],tag:'announcement',vis:['all'],popts:['',''],filter:'all',page:'feed',role:'associate',unsub:null,ready:false};
+const HR = {id:'HRADMIN',name:'HR Admin',role:'hr',group:'all'};
+const HRPWD = 'hr@2024';
+const GROUPS = ['all','managers','sales','it','hr','operations'];
+const TAGS = [{k:'announcement',l:'Announcement'},{k:'policy',l:'Policy'},{k:'event',l:'Event'},{k:'reminder',l:'Reminder'},{k:'general',l:'General'}];
+
+// Show login immediately - no loading screen
+showLogin();
+loadAssocs();
+
+function showLogin() {
+  document.getElementById('app').innerHTML = `
+  <div class="login-wrap">
+    <div class="login-left">
+      <div class="login-bg">HR</div>
+      <div class="brand"><div class="brand-icon">&#127970;</div><div class="brand-name">HR <em>Connect</em></div></div>
+      <div class="tagline">Your team,<br><em>always</em><br>informed.</div>
+      <div class="tagdesc">A secure portal for HR to share updates, run polls, and manage your workforce.</div>
+      <div class="pills">
+        <span class="pill">Announcements</span>
+        <span class="pill">Live Polls</span>
+        <span class="pill">Group Access</span>
+        <span class="pill">Team Management</span>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="lf">
+        <h2>Sign in</h2>
+        <p>Enter your credentials to continue</p>
+        <div class="rtabs">
+          <button class="rtab on" onclick="setRole('associate')">Associate</button>
+          <button class="rtab" onclick="setRole('manager')">Manager</button>
+          <button class="rtab" onclick="setRole('hr')">HR Admin</button>
+        </div>
+        <label class="flabel" id="idlabel">Employee ID</label>
+        <input class="finp" id="lid" type="text" placeholder="e.g. EMP001" />
+        <label class="flabel">Password</label>
+        <input class="finp" id="lpwd" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()" />
+        <button class="lbtn" id="lbtn" onclick="doLogin()">Sign In</button>
+        <div class="lerr" id="lerr"></div>
+        <div class="dbst" id="dbst">Connecting to database...</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function loadAssocs() {
+  try {
+    const snap = await getDocs(collection(db,'associates'));
+    S.assocs = snap.docs.map(d=>({fid:d.id,...d.data()}));
+    S.ready = true;
+    const el = document.getElementById('dbst');
+    if (el) { el.textContent = 'Database connected'; el.style.background='#d1fae5'; el.style.color='#059669'; }
+  } catch(e) {
+    console.error('DB error:',e);
+    const el = document.getElementById('dbst');
+    if (el) { el.textContent = 'DB offline - HR login still works'; }
+  }
+}
+
+window.setRole = function(r) {
+  S.role = r;
+  document.querySelectorAll('.rtab').forEach((b,i)=>b.classList.toggle('on',['associate','manager','hr'][i]===r));
+  document.getElementById('idlabel').textContent = {associate:'Employee ID',manager:'Manager ID',hr:'HR Admin ID'}[r];
+};
+
+window.doLogin = async function() {
+  const id = document.getElementById('lid').value.trim().toUpperCase();
+  const pwd = document.getElementById('lpwd').value;
+  const btn = document.getElementById('lbtn');
+  const err = document.getElementById('lerr');
+  err.style.display='none'; btn.disabled=true; btn.textContent='Signing in...';
+  try {
+    if (id==='HRADMIN' && pwd===HRPWD) { enterDash(HR); return; }
+    if (!S.ready) await loadAssocs();
+    const u = S.assocs.find(a=>a.id===id && a.password===pwd);
+    if (!u) { showErr('Invalid credentials.'); return; }
+    if (u.status==='inactive') { showErr('Account deactivated. Contact HR.'); return; }
+    enterDash(u);
+  } catch(e) { showErr('Connection error. Try again.'); }
+  finally { btn.disabled=false; btn.textContent='Sign In'; }
+};
+
+function showErr(m) {
+  const e = document.getElementById('lerr');
+  e.textContent=m; e.style.display='block';
+  setTimeout(()=>e.style.display='none',4000);
+}
+
+function enterDash(user) {
+  S.user = user;
+  const ini = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const bc = user.role==='hr'?'#059669':user.role==='manager'?'#d97706':'#6366f1';
+  const bb = user.role==='hr'?'bhr':user.role==='manager'?'bmg':'bas';
+  const bl = user.role==='hr'?'HR Admin':user.role==='manager'?'Manager':'Associate';
+  document.getElementById('app').innerHTML = `
+  <div class="dash" id="dash" style="display:block">
+    <div class="topbar">
+      <div class="tb-brand"><div class="tb-dot"></div>HR Connect</div>
+      <div class="tb-r">
+        <div class="av" style="background:${bc}">${ini}</div>
+        <span class="tbname">${esc(user.name)}</span>
+        <span class="tbbadge ${bb}">${bl}</span>
+        <button class="tblout" onclick="doLogout()">Sign out</button>
+      </div>
+    </div>
+    <div class="layout">
+      <div class="sidebar"><div class="smenu" id="smenu"></div></div>
+      <div class="main" id="main"></div>
+    </div>
+  </div>`;
+  S.page='feed';
+  subUpdates();
+  renderMenu();
+  renderPage();
+}
+
+window.doLogout = function() {
+  if (S.unsub) S.unsub();
+  S.user=null; S.page='feed'; S.filter='all';
+  showLogin(); loadAssocs();
+};
+
+function subUpdates() {
+  if (S.unsub) S.unsub();
+  try {
+    const q = query(collection(db,'updates'),orderBy('createdAt','desc'));
+    S.unsub = onSnapshot(q, snap=>{
+      S.updates = snap.docs.map(d=>({fid:d.id,...d.data()}));
+      if (S.page==='feed') renderPage();
+    }, e=>console.error(e));
+  } catch(e){console.error(e);}
+}
+
+function renderMenu() {
+  const isHR = S.user?.role==='hr';
+  let items = [{id:'feed',icon:'&#128203;',label:'Updates Feed'}];
+  if (isHR) items.push(
+    {id:'post',icon:'&#128226;',label:'Post Update'},
+    {id:'poll',icon:'&#128202;',label:'Create Poll'},
+    {div:true},
+    {id:'associates',icon:'&#128101;',label:'Manage Associates'}
+  );
+  document.getElementById('smenu').innerHTML = items.map(i=>{
+    if(i.div) return '<div class="mdiv"></div>';
+    return `<button class="mi ${S.page===i.id?'on':''}" onclick="goTo('${i.id}')">${i.icon} ${i.label}</button>`;
+  }).join('');
+}
+
+window.goTo = function(p){S.page=p;renderMenu();renderPage();};
+
+function renderPage() {
+  const main = document.getElementById('main');
+  if(!main) return;
+  if(S.page==='feed') renderFeed(main);
+  else if(S.page==='post') renderPost(main);
+  else if(S.page==='poll') renderPoll(main);
+  else if(S.page==='associates') renderAssocs(main);
+}
+
+function renderFeed(main) {
+  const u=S.user, isHR=u.role==='hr';
+  let items = S.updates.filter(upd=>isHR||upd.visibility?.includes('all')||upd.visibility?.includes(u.group));
+  if(S.filter!=='all') items=items.filter(i=>i.type==='poll'?S.filter==='poll':i.tag===S.filter);
+  const stats = isHR?`<div class="sr">
+    <div class="sc"><div class="sv">${S.assocs.filter(a=>a.status==='active').length}</div><div class="sl2">Active Associates</div></div>
+    <div class="sc"><div class="sv">${S.updates.filter(u=>u.type==='update').length}</div><div class="sl2">Updates Posted</div></div>
+    <div class="sc"><div class="sv">${S.updates.filter(u=>u.type==='poll').length}</div><div class="sl2">Polls</div></div>
+    <div class="sc"><div class="sv">${S.assocs.filter(a=>a.status==='inactive').length}</div><div class="sl2">Deactivated</div></div>
+  </div>`:'';
+  const fls=['all','announcement','policy','event','reminder','poll'];
+  const fln={all:'All',announcement:'Announcements',policy:'Policy',event:'Events',reminder:'Reminders',poll:'Polls'};
+  main.innerHTML=`${stats}
+    <div class="ph"><div class="ptitle">Updates Feed</div></div>
+    <div class="fr2">${fls.map(f=>`<button class="fpill ${S.filter===f?'on':''}" onclick="setFilt('${f}')">${fln[f]}</button>`).join('')}</div>
+    <div id="flist"></div>`;
+  const fl=document.getElementById('flist');
+  if(!items.length){fl.innerHTML=`<div class="empty"><div class="ei">&#128205;</div><div class="et">No updates yet</div><div class="es">${isHR?'Post your first update!':'Check back soon.'}</div></div>`;return;}
+  fl.innerHTML=items.map((item,i)=>item.type==='poll'?makePoll(item,isHR,i):makeUpdate(item,isHR,i)).join('');
+}
+
+window.setFilt=f=>{S.filter=f;renderPage();};
+
+function makeUpdate(u,isHR,idx){
+  const tag=TAGS.find(t=>t.k===u.tag)||TAGS[4];
+  const vis=u.visibility?.includes('all')?'All Staff':(u.visibility||[]).map(v=>v.charAt(0).toUpperCase()+v.slice(1)).join(', ');
+  const tc={announcement:'ta',policy:'tp',event:'te',reminder:'tr2',general:'tg'}[u.tag]||'tg';
+  return `<div class="uc" style="animation-delay:${idx*0.04}s">
+    <div class="uctop">
+      <div class="ucmeta">
+        <span class="utag ${tc}">${tag.l}</span>
+        <span class="uvis">${vis}</span>
+        <span class="udate">${fmt(u.createdAt)}</span>
+      </div>
+      ${isHR?`<button class="btn bdr bsm" onclick="del('${u.fid}')">Delete</button>`:''}
+    </div>
+    <div class="utitle">${esc(u.title)}</div>
+    <div class="ubody">${esc(u.body)}</div>
+    <div class="ufoot"><span>By ${esc(u.author)}</span></div>
+  </div>`;
+}
+
+function makePoll(p,isHR,idx){
+  const tot=Object.values(p.votes||{}).reduce((a,b)=>a+b,0);
+  const voted=(p.votedBy||[]).includes(S.user.id);
+  const show=isHR||voted;
+  const opts=(p.options||[]).map(opt=>{
+    if(show){const c=p.votes?.[opt]||0,pc=tot>0?Math.round(c/tot*100):0;
+      return `<div class="pres"><div class="prl"><span>${esc(opt)}</span><span>${c} votes (${pc}%)</span></div><div class="pbb"><div class="pbf" style="width:${pc}%"></div></div></div>`;}
+    return `<button class="pob" onclick="vote('${p.fid}','${esc(opt)}')">${esc(opt)}</button>`;
+  }).join('');
+  return `<div class="pc" style="animation-delay:${idx*0.04}s">
+    <div class="pbadge">Poll${voted?' - Voted':''}</div>
+    <div class="pq">${esc(p.question)}</div>
+    ${opts}
+    <div class="pfoot"><span>${tot} votes</span>${isHR?`<button class="btn bdr bsm" onclick="del('${p.fid}')">Delete</button>`:''}</div>
+  </div>`;
+}
+
+window.vote=async function(pid,opt){
+  const poll=S.updates.find(u=>u.fid===pid);
+  if(!poll||(poll.votedBy||[]).includes(S.user.id))return;
+  const nv={...poll.votes,[opt]:(poll.votes?.[opt]||0)+1};
+  const nb=[...(poll.votedBy||[]),S.user.id];
+  await updateDoc(doc(db,'updates',pid),{votes:nv,votedBy:nb});
+  toastMsg('Vote submitted!');
+};
+
+window.del=async function(id){
+  if(!confirm('Delete?'))return;
+  await deleteDoc(doc(db,'updates',id));
+  toastMsg('Deleted');
+};
+
+function renderPost(main){
+  const th=TAGS.map(t=>`<span class="tchip ${S.tag===t.k?'on':''}" onclick="setTag('${t.k}')">${t.l}</span>`).join('');
+  const vh=GROUPS.map(g=>`<span class="vchip ${S.vis.includes(g)?'on':''}" onclick="togVis('${g}')">${g==='all'?'All Staff':g.charAt(0).toUpperCase()+g.slice(1)}</span>`).join('');
+  main.innerHTML=`<div class="ph"><div class="ptitle">Post an Update</div></div>
+    <div class="card">
+      <div class="fld"><label>Title</label><input class="fi" id="pt" placeholder="Update title..."/></div>
+      <div class="fld"><label>Message</label><textarea class="ft" id="pb" placeholder="Write your message..."></textarea></div>
+      <div class="fld"><label>Tag</label><div class="trow">${th}</div></div>
+      <div class="fld"><label>Visible To</label><div class="vrow">${vh}</div></div>
+      <button class="btn bp2" id="pbtn" onclick="subPost()">Publish Update</button>
+    </div>`;
+}
+
+window.setTag=t=>{S.tag=t;renderPage();};
+window.togVis=function(g){
+  if(g==='all'){S.vis=['all'];}
+  else{
+    S.vis=S.vis.filter(v=>v!=='all');
+    if(S.vis.includes(g))S.vis=S.vis.filter(v=>v!==g); else S.vis.push(g);
+    if(!S.vis.length)S.vis=['all'];
+  }
+  renderPage();
+};
+
+window.subPost=async function(){
+  const t=document.getElementById('pt').value.trim(), b=document.getElementById('pb').value.trim();
+  if(!t||!b){alert('Fill in title and message.');return;}
+  const btn=document.getElementById('pbtn'); btn.disabled=true; btn.textContent='Publishing...';
+  try{
+    await addDoc(collection(db,'updates'),{type:'update',title:t,body:b,tag:S.tag,visibility:[...S.vis],author:S.user.name,createdAt:serverTimestamp()});
+    S.tag='announcement';S.vis=['all'];S.page='feed';renderMenu();renderPage();toastMsg('Update published!');
+  }finally{btn.disabled=false;btn.textContent='Publish Update';}
+};
+
+function renderPoll(main){
+  const oh=S.popts.map((o,i)=>`<div class="por"><input class="fi" value="${esc(o)}" oninput="S.popts[${i}]=this.value" placeholder="Option ${i+1}..."/>${S.popts.length>2?`<button class="ro" onclick="remOpt(${i})">x</button>`:''}</div>`).join('');
+  const vh=GROUPS.map(g=>`<span class="vchip ${S.vis.includes(g)?'on':''}" onclick="togVis('${g}')">${g==='all'?'All Staff':g.charAt(0).toUpperCase()+g.slice(1)}</span>`).join('');
+  main.innerHTML=`<div class="ph"><div class="ptitle">Create a Poll</div></div>
+    <div class="card">
+      <div class="fld"><label>Question</label><input class="fi" id="pq2" placeholder="e.g. Which day works for team lunch?"/></div>
+      <div class="fld"><label>Options</label><div id="polist">${oh}</div><button class="btn bgh bsm" onclick="addOpt()">+ Add Option</button></div>
+      <div class="fld"><label>Visible To</label><div class="vrow">${vh}</div></div>
+      <button class="btn bp2" id="pllbtn" onclick="subPoll()">Launch Poll</button>
+    </div>`;
+}
+
+window.addOpt=()=>{S.popts.push('');renderPage();};
+window.remOpt=i=>{S.popts.splice(i,1);renderPage();};
+
+window.subPoll=async function(){
+  const q=document.getElementById('pq2').value.trim();
+  const opts=S.popts.filter(o=>o.trim());
+  if(!q||opts.length<2){alert('Enter question and at least 2 options.');return;}
+  const btn=document.getElementById('pllbtn'); btn.disabled=true; btn.textContent='Launching...';
+  const votes={};opts.forEach(o=>votes[o]=0);
+  try{
+    await addDoc(collection(db,'updates'),{type:'poll',question:q,options:opts,votes,visibility:[...S.vis],votedBy:[],createdAt:serverTimestamp()});
+    S.popts=['',''];S.vis=['all'];S.page='feed';renderMenu();renderPage();toastMsg('Poll launched!');
+  }finally{btn.disabled=false;btn.textContent='Launch Poll';}
+};
+
+async function renderAssocs(main){
+  await loadAssocs();
+  main.innerHTML=`<div class="ph"><div class="ptitle">Manage Associates</div></div>
+    <div class="card">
+      <div class="ct">Add New Associate</div>
+      <div class="fr">
+        <div class="fld"><label>Employee ID</label><input class="fi" id="nid" placeholder="EMP005"/></div>
+        <div class="fld"><label>Full Name</label><input class="fi" id="nnm" placeholder="Full name"/></div>
+      </div>
+      <div class="fr">
+        <div class="fld"><label>Password</label><input class="fi" id="npw" placeholder="Password"/></div>
+        <div class="fld"><label>Role</label><select class="fs" id="nrl"><option value="associate">Associate</option><option value="manager">Manager</option></select></div>
+        <div class="fld"><label>Department</label><select class="fs" id="ngp">${GROUPS.filter(g=>g!=='all').map(g=>`<option value="${g}">${g.charAt(0).toUpperCase()+g.slice(1)}</option>`).join('')}</select></div>
+      </div>
+      <button class="btn bg2" id="abtn" onclick="addAssoc()">+ Add Associate</button>
+    </div>
+    <div class="card">
+      <div class="ct">All Associates (${S.assocs.length})</div>
+      <table class="at">
+        <thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Dept</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${S.assocs.length===0?`<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--sl)">No associates yet. Add your first one above!</td></tr>`:
+        S.assocs.map(a=>`<tr>
+          <td><strong>${esc(a.id)}</strong></td>
+          <td>${esc(a.name)}</td>
+          <td>${a.role}</td>
+          <td><span class="gbadge">${a.group}</span></td>
+          <td><span class="sdot ${a.status==='active'?'sact':'sinact'}">${a.status==='active'?'Active':'Inactive'}</span></td>
+          <td><div class="abts">
+            ${a.status==='active'?`<button class="btn bgh bsm" onclick="togSt('${a.fid}','inactive')">Deactivate</button>`:`<button class="btn bg2 bsm" onclick="togSt('${a.fid}','active')">Reactivate</button>`}
+            <button class="btn bdr bsm" onclick="remAssoc('${a.fid}')">Delete</button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
+window.addAssoc=async function(){
+  const id=document.getElementById('nid').value.trim().toUpperCase();
+  const name=document.getElementById('nnm').value.trim();
+  const pwd=document.getElementById('npw').value.trim();
+  const role=document.getElementById('nrl').value;
+  const group=document.getElementById('ngp').value;
+  if(!id||!name||!pwd){alert('Please fill all fields.');return;}
+  if(S.assocs.find(a=>a.id===id)){alert('ID already exists.');return;}
+  const btn=document.getElementById('abtn'); btn.disabled=true; btn.textContent='Adding...';
+  try{
+    await addDoc(collection(db,'associates'),{id,name,password:pwd,role,group,status:'active',createdAt:serverTimestamp()});
+    await loadAssocs(); renderPage(); toastMsg('Associate added!');
+  }finally{btn.disabled=false;btn.textContent='+ Add Associate';}
+};
+
+window.togSt=async function(fid,ns){
+  await updateDoc(doc(db,'associates',fid),{status:ns});
+  await loadAssocs(); renderPage();
+  toastMsg(ns==='active'?'Account reactivated':'Account deactivated');
+};
+
+window.remAssoc=async function(fid){
+  if(!confirm('Permanently delete this associate?'))return;
+  await deleteDoc(doc(db,'associates',fid));
+  await loadAssocs(); renderPage(); toastMsg('Associate removed');
+};
+
+function fmt(ts){if(!ts)return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toastMsg(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
+window.S=S;
+</script>
+</body>
+</html>
