@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Connect</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f1f5f9;min-height:100vh}
+#LP{background:#111;min-height:100vh;display:flex;align-items:center;justify-content:center}
+#LP .box{background:white;padding:36px;border-radius:16px;width:340px}
+#LP h2{font-size:22px;font-weight:800;margin-bottom:4px;color:#111}
+#LP h2 span{color:#059669}
+#LP .sub{color:#666;font-size:13px;margin-bottom:20px}
+.tabs{display:flex;background:#f8fafc;border-radius:8px;padding:3px;margin-bottom:18px;border:1px solid #eee}
+.tab{flex:1;padding:11px;border:none;background:transparent;font-size:13px;font-weight:700;color:#666;border-radius:6px;cursor:pointer}
+.tab.on{background:#111;color:white}
+.flbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:5px}
+.inp{width:100%;padding:12px;border:2px solid #eee;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none;font-family:Arial}
+.inp:focus{border-color:#059669}
+.lbtn{width:100%;padding:13px;background:#111;border:none;border-radius:8px;color:white;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.lbtn:hover{background:#059669}
+.err{margin-top:10px;padding:8px;border-radius:6px;font-size:13px;text-align:center;display:none;background:#fee2e2;color:#dc2626}
+#DP{display:none}
+.tb{background:#111;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.tb-logo{color:white;font-size:16px;font-weight:800}
+.tb-logo em{color:#6ee7b7;font-style:normal}
+.tb-user{color:rgba(255,255,255,0.7);font-size:12px}
+.tb-out{background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+.nav{background:white;border-bottom:1px solid #e5e7eb;display:flex;padding:0 20px;overflow-x:auto}
+.nb{padding:12px 16px;border:none;background:transparent;font-size:13px;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.nb.on{color:#059669;border-bottom-color:#059669}
+.ct{max-width:860px;margin:0 auto;padding:20px 16px}
+.card{background:white;border-radius:12px;border:1px solid #e5e7eb;padding:20px;margin-bottom:14px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:14px;color:#111}
+.fi{width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;margin-bottom:9px;font-family:Arial}
+.fi:focus{border-color:#059669}
+.fta{min-height:85px;resize:vertical}
+.gb{background:#059669;color:white;border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.gb:hover{background:#047857}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:white;border-radius:10px;border:1px solid #e5e7eb;padding:14px;text-align:center}
+.sn{font-size:26px;font-weight:800;color:#111}
+.sl{font-size:11px;color:#666;margin-top:2px}
+.fps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.fp{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #e5e7eb;background:white;color:#666}
+.fp.on{background:#111;color:white;border-color:#111}
+.uc{background:white;border-radius:10px;border:1px solid #e5e7eb;padding:15px;margin-bottom:10px}
+.utop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+.utag{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.ta{background:#d1fae5;color:#059669}.tp{background:#fef3c7;color:#d97706}
+.te{background:#dbeafe;color:#2563eb}.tr{background:#fee2e2;color:#dc2626}.tg{background:#f1f5f9;color:#666}
+.ut{font-size:14px;font-weight:700;color:#111;margin-bottom:4px}
+.ub{font-size:13px;color:#4b5563;line-height:1.6;white-space:pre-wrap}
+.uf{margin-top:9px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:11px;color:#999;display:flex;justify-content:space-between}
+.pc{background:white;border-radius:10px;border:1.5px solid #dbeafe;padding:15px;margin-bottom:10px}
+.pb2{background:#dbeafe;color:#2563eb;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.pq{font-size:14px;font-weight:700;color:#111;margin-bottom:10px}
+.pbar{margin-bottom:7px}
+.pbl{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:3px}
+.pbbg{height:6px;background:#e5e7eb;border-radius:10px;overflow:hidden}
+.pbf{height:100%;background:#059669;border-radius:10px}
+.ar{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f8fafc;flex-wrap:wrap}
+.aid{font-weight:700;font-size:12px;width:70px;color:#111}
+.an{flex:1;font-size:12px;color:#374151;min-width:100px}
+.sb{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.sa{background:#d1fae5;color:#059669}.si{background:#f1f5f9;color:#666}
+.sm2{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #e5e7eb;background:white;color:#666}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid #e5e7eb;background:white;cursor:pointer;color:#666}
+.chip.on{border-color:#059669;background:#d1fae5;color:#059669}
+.vchip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid #e5e7eb;background:white;cursor:pointer;color:#666}
+.vchip.on{border-color:#2563eb;background:#dbeafe;color:#2563eb}
+.toast{position:fixed;bottom:18px;right:18px;background:#111;color:white;padding:11px 16px;border-radius:9px;font-size:13px;display:none;z-index:999}
+.empty{text-align:center;padding:36px;color:#94a3b8;font-size:13px}
+.lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:6px;margin-top:4px}
+@media(max-width:580px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="LP">
+  <div class="box">
+    <h2>HR <span>Connect</span></h2>
+    <div class="sub">Sign in to your portal</div>
+    <div class="tabs">
+      <button class="tab on" id="t0">Associate</button>
+      <button class="tab" id="t1">Manager</button>
+      <button class="tab" id="t2">HR Admin</button>
+    </div>
+    <label class="flbl" id="idlbl">Employee ID</label>
+    <input class="inp" type="text" id="lid" placeholder="e.g. EMP001 or HRADMIN" />
+    <label class="flbl">Password</label>
+    <input class="inp" type="password" id="lpwd" placeholder="Enter password" />
+    <button class="lbtn" id="lbtn">Sign In</button>
+    <div class="err" id="lerr"></div>
+  </div>
+</div>
+
+<div id="DP">
+  <div class="tb">
+    <div class="tb-logo">HR <em>Connect</em></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="tb-user" id="tbu"></span>
+      <button class="tb-out" id="outBtn">Sign out</button>
+    </div>
+  </div>
+  <div class="nav" id="nav"></div>
+  <div class="ct" id="main"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var HRPWD = 'hr@2024';
+var PROJECT = 'hr-connect-3c286';
+var APIKEY = 'AIzaSyA-5I3dKQnFaYF0I1tOUyYcRP-mhgEBlW0';
+var BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/';
+var TAGS = ['announcement','policy','event','reminder','general'];
+var GROUPS = ['all','managers','sales','it','hr','operations'];
+var CU = null;
+var S = {updates:[],assocs:[],page:'feed',tag:'announcement',vis:['all'],popts:['',''],filter:'all'};
+
+// Setup tabs
+document.getElementById('t0').onclick = function(){ setRole('associate'); };
+document.getElementById('t1').onclick = function(){ setRole('manager'); };
+document.getElementById('t2').onclick = function(){ setRole('hr'); };
+document.getElementById('lbtn').onclick = login;
+document.getElementById('lpwd').onkeydown = function(e){ if(e.key==='Enter') login(); };
+document.getElementById('outBtn').onclick = logout;
+
+// Load assocs on start
+fsGet('associates').then(function(a){ S.assocs = a; });
+
+function setRole(r) {
+  document.getElementById('t0').classList.toggle('on', r==='associate');
+  document.getElementById('t1').classList.toggle('on', r==='manager');
+  document.getElementById('t2').classList.toggle('on', r==='hr');
+  document.getElementById('idlbl').textContent = r==='hr' ? 'HR Admin ID' : r==='manager' ? 'Manager ID' : 'Employee ID';
+}
+
+function login() {
+  var id = document.getElementById('lid').value.trim().toUpperCase();
+  var pwd = document.getElementById('lpwd').value.trim();
+  var err = document.getElementById('lerr');
+  err.style.display = 'none';
+  if (!id || !pwd) { err.textContent='Enter ID and password.'; err.style.display='block'; return; }
+  if (id === 'HRADMIN' && pwd === HRPWD) { enterDash({id:'HRADMIN',name:'HR Admin',role:'hr',group:'all'}); return; }
+  var u = S.assocs.find(function(a){ return a.id===id && a.password===pwd; });
+  if (u) {
+    if (u.status === 'inactive') { err.textContent='Account deactivated.'; err.style.display='block'; return; }
+    enterDash(u); return;
+  }
+  err.textContent = 'Invalid credentials.';
+  err.style.display = 'block';
+}
+
+function enterDash(user) {
+  CU = user;
+  document.getElementById('LP').style.display = 'none';
+  document.getElementById('DP').style.display = 'block';
+  document.getElementById('tbu').textContent = user.name + (user.role==='hr'?' | HR Admin':user.role==='manager'?' | Manager':'');
+  S.page = 'feed';
+  renderNav();
+  renderPage();
+  loadData();
+}
+
+function logout() {
+  CU = null;
+  document.getElementById('LP').style.display = 'flex';
+  document.getElementById('DP').style.display = 'none';
+  document.getElementById('lid').value = '';
+  document.getElementById('lpwd').value = '';
+}
+
+async function loadData() {
+  S.updates = await fsGet('updates');
+  S.updates.sort(function(a,b){ return (b.createdAt||'') > (a.createdAt||'') ? 1 : -1; });
+  S.assocs = await fsGet('associates');
+  renderPage();
+}
+
+function renderNav() {
+  var items = [{id:'feed',l:'Updates'}];
+  if (CU.role==='hr') items = items.concat([{id:'post',l:'Post Update'},{id:'poll',l:'Create Poll'},{id:'assocs',l:'Associates'}]);
+  var nav = document.getElementById('nav');
+  nav.innerHTML = '';
+  items.forEach(function(i) {
+    var b = document.createElement('button');
+    b.className = 'nb' + (S.page===i.id?' on':'');
+    b.textContent = i.l;
+    b.onclick = function(){ goTo(i.id); };
+    nav.appendChild(b);
+  });
+}
+
+function goTo(p) { S.page=p; renderNav(); renderPage(); }
+
+function renderPage() {
+  var m = document.getElementById('main');
+  if (!m) return;
+  if (S.page==='feed') renderFeed(m);
+  else if (S.page==='post') renderPost(m);
+  else if (S.page==='poll') renderPollPg(m);
+  else if (S.page==='assocs') renderAssocsPg(m);
+}
+
+function renderFeed(m) {
+  var isHR = CU.role==='hr';
+  var items = S.updates.filter(function(u){
+    if (isHR) return true;
+    return u.visibility && (u.visibility.indexOf('all')>=0 || u.visibility.indexOf(CU.group)>=0);
+  });
+  if (S.filter!=='all') items = items.filter(function(i){ return i.type==='poll' ? S.filter==='poll' : i.tag===S.filter; });
+
+  var html = '';
+  if (isHR) {
+    html += '<div class="stats">';
+    html += '<div class="stat"><div class="sn">'+S.assocs.filter(function(a){return a.status==='active';}).length+'</div><div class="sl">Active</div></div>';
+    html += '<div class="stat"><div class="sn">'+S.updates.filter(function(u){return u.type==='update';}).length+'</div><div class="sl">Updates</div></div>';
+    html += '<div class="stat"><div class="sn">'+S.updates.filter(function(u){return u.type==='poll';}).length+'</div><div class="sl">Polls</div></div>';
+    html += '<div class="stat"><div class="sn">'+S.assocs.filter(function(a){return a.status==='inactive';}).length+'</div><div class="sl">Inactive</div></div>';
+    html += '</div>';
+  }
+
+  var fls = ['all','announcement','policy','event','reminder','poll'];
+  var fln = {all:'All',announcement:'Announcements',policy:'Policy',event:'Events',reminder:'Reminders',poll:'Polls'};
+  html += '<div class="fps">';
+  fls.forEach(function(f){
+    html += '<button class="fp'+(S.filter===f?' on':'')+'" data-f="'+f+'">'+fln[f]+'</button>';
+  });
+  html += '</div><div id="flist"></div>';
+  m.innerHTML = html;
+
+  m.querySelectorAll('.fp').forEach(function(b){
+    b.onclick = function(){ S.filter=this.dataset.f; renderPage(); };
+  });
+
+  var fl = document.getElementById('flist');
+  if (!items.length) { fl.innerHTML='<div class="empty">'+(isHR?'No updates yet!':'No updates yet.')+'</div>'; return; }
+  fl.innerHTML = items.map(function(i){ return i.type==='poll' ? makePoll(i,isHR) : makeUpdate(i,isHR); }).join('');
+
+  fl.querySelectorAll('.delBtn').forEach(function(b){
+    b.onclick = function(){ delItem(this.dataset.id); };
+  });
+  fl.querySelectorAll('.voteBtn').forEach(function(b){
+    b.onclick = function(){ castVote(this.dataset.pid, this.dataset.opt); };
+  });
+}
+
+function makeUpdate(u, isHR) {
+  var tc = {announcement:'ta',policy:'tp',event:'te',reminder:'tr',general:'tg'}[u.tag]||'tg';
+  var img = u.image ? '<img src="'+u.image+'" style="max-width:100%;border-radius:8px;margin:10px 0;border:1px solid #e5e7eb"/>' : '';
+  return '<div class="uc"><div class="utop"><span class="utag '+tc+'">'+(u.tag||'general')+'</span>'+
+    (isHR?'<button class="sm2 delBtn" style="color:#dc2626" data-id="'+u.fid+'">Delete</button>':'')+
+    '</div><div class="ut">'+esc(u.title||'')+'</div>'+
+    '<div class="ub">'+esc(u.body||'')+'</div>'+img+
+    '<div class="uf"><span>By '+(u.author||'HR')+'</span><span>'+fmt(u.createdAt)+'</span></div></div>';
+}
+
+function makePoll(p, isHR) {
+  var tot=0;
+  if (p.votes && typeof p.votes==='object') Object.keys(p.votes).forEach(function(k){tot+=parseInt(p.votes[k])||0;});
+  var voted = CU && (p.votedBy||[]).indexOf(CU.id) >= 0;
+  var showResults = isHR || voted;
+  var opts = (p.options||[]).map(function(opt){
+    if (showResults) {
+      var c=p.votes&&p.votes[opt]?parseInt(p.votes[opt]):0, pc=tot>0?Math.round(c/tot*100):0;
+      return '<div class="pbar"><div class="pbl"><span>'+esc(opt)+'</span><span>'+c+' ('+pc+'%)</span></div><div class="pbbg"><div class="pbf" style="width:'+pc+'%"></div></div></div>';
+    }
+    return '<button class="sm2 voteBtn" data-pid="'+p.fid+'" data-opt="'+esc(opt)+'" style="width:100%;text-align:left;padding:10px 14px;margin-bottom:7px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#f8fafc">'+esc(opt)+'</button>';
+  }).join('');
+  return '<div class="pc"><span class="pb2">POLL'+(voted?' - VOTED':'')+'</span><div class="pq">'+esc(p.question||'')+'</div>'+opts+
+    '<div class="uf"><span>'+tot+' votes</span>'+(isHR?'<button class="sm2 delBtn" style="color:#dc2626" data-id="'+p.fid+'">Delete</button>':'')+'</div></div>';
+}
+
+async function castVote(pid, opt) {
+  var poll = S.updates.find(function(u){ return u.fid===pid; });
+  if (!poll) return;
+  if ((poll.votedBy||[]).indexOf(CU.id) >= 0) { toast('You already voted!'); return; }
+  var nv = Object.assign({}, poll.votes||{});
+  nv[opt] = (parseInt(nv[opt])||0) + 1;
+  var nb = (poll.votedBy||[]).concat([CU.id]);
+  await fsPatch('updates', pid, {votes:nv, votedBy:nb});
+  toast('Vote submitted!');
+  await loadData();
+}
+
+async function delItem(id) {
+  if (!confirm('Delete?')) return;
+  await fsDel('updates', id);
+  toast('Deleted!');
+  await loadData();
+}
+
+function renderPost(m) {
+  m.innerHTML = '<div class="card"><h3>Post New Update</h3>'+
+    '<input class="fi" id="pt" placeholder="Title..." />'+
+    '<textarea class="fi fta" id="pb" placeholder="Message..."></textarea>'+
+    '<label class="lbl">Tag</label><div class="chips" id="tagChips"></div>'+
+    '<label class="lbl">Visible To</label><div class="chips" id="visChips"></div>'+
+    '<label class="lbl">Photo (optional)</label>'+
+    '<input type="file" id="pimg" accept="image/*" style="width:100%;padding:8px;border:1.5px dashed #e5e7eb;border-radius:8px;font-size:13px;margin-bottom:9px;cursor:pointer"/>'+
+    '<div id="imgPreview" style="margin-bottom:9px"></div>'+
+    '<button class="gb" id="postBtn">Publish Update</button>'+
+    '<span id="pmsg" style="margin-left:10px;font-size:13px;color:#059669"></span></div>';
+
+  renderChips();
+  document.getElementById('postBtn').onclick = subPost;
+  document.getElementById('pimg').onchange = function() {
+    var file = this.files[0];
+    var preview = document.getElementById('imgPreview');
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        preview.innerHTML = '<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e5e7eb"/>';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.innerHTML = '';
+    }
+  };
+}
+
+function renderChips() {
+  var tc = document.getElementById('tagChips');
+  var vc = document.getElementById('visChips');
+  if (tc) {
+    tc.innerHTML='';
+    TAGS.forEach(function(t){
+      var s=document.createElement('span');
+      s.className='chip'+(S.tag===t?' on':'');
+      s.textContent=t.charAt(0).toUpperCase()+t.slice(1);
+      s.onclick=function(){S.tag=t;renderChips();};
+      tc.appendChild(s);
+    });
+  }
+  if (vc) {
+    vc.innerHTML='';
+    GROUPS.forEach(function(g){
+      var s=document.createElement('span');
+      s.className='vchip'+(S.vis.indexOf(g)>=0?' on':'');
+      s.textContent=g==='all'?'All Staff':g.charAt(0).toUpperCase()+g.slice(1);
+      s.onclick=function(){togVis(g);};
+      vc.appendChild(s);
+    });
+  }
+}
+
+function togVis(g) {
+  if (g==='all'){S.vis=['all'];}
+  else{
+    S.vis=S.vis.filter(function(v){return v!=='all';});
+    var i=S.vis.indexOf(g);
+    if(i>=0)S.vis.splice(i,1); else S.vis.push(g);
+    if(!S.vis.length)S.vis=['all'];
+  }
+  renderChips();
+}
+
+async function subPost() {
+  var t=document.getElementById('pt').value.trim();
+  var b=document.getElementById('pb').value.trim();
+  if(!t||!b){alert('Enter title and message.');return;}
+  document.getElementById('pmsg').textContent='Publishing...';
+  var imgFile = document.getElementById('pimg').files[0];
+  if (imgFile) {
+    var reader = new FileReader();
+    reader.onload = async function(e) {
+      var imgData = e.target.result;
+      await fsAdd('updates',{type:'update',title:t,body:b,tag:S.tag,visibility:S.vis.slice(),author:CU.name,image:imgData,createdAt:new Date().toISOString()});
+      toast('Published!'); S.tag='announcement'; S.vis=['all'];
+      await loadData(); goTo('feed');
+    };
+    reader.readAsDataURL(imgFile);
+  } else {
+    await fsAdd('updates',{type:'update',title:t,body:b,tag:S.tag,visibility:S.vis.slice(),author:CU.name,createdAt:new Date().toISOString()});
+    toast('Published!'); S.tag='announcement'; S.vis=['all'];
+    await loadData(); goTo('feed');
+  }
+}
+
+function renderPollPg(m) {
+  m.innerHTML='<div class="card"><h3>Create a Poll</h3>'+
+    '<input class="fi" id="pq" placeholder="Question..." />'+
+    '<div id="polist"></div>'+
+    '<button class="sm2" id="addOptBtn" style="margin-bottom:12px">+ Add Option</button>'+
+    '<label class="lbl">Visible To</label><div class="chips" id="pvisChips"></div>'+
+    '<button class="gb" id="pollBtn">Launch Poll</button>'+
+    '<span id="plmsg" style="margin-left:10px;font-size:13px;color:#059669"></span></div>';
+
+  renderPollOpts();
+  renderPollVis();
+  document.getElementById('addOptBtn').onclick=function(){S.popts.push('');renderPollOpts();};
+  document.getElementById('pollBtn').onclick=subPoll;
+}
+
+function renderPollOpts() {
+  var list=document.getElementById('polist');
+  if(!list)return;
+  list.innerHTML='';
+  S.popts.forEach(function(o,i){
+    var d=document.createElement('div');
+    d.style.cssText='display:flex;gap:7px;margin-bottom:7px';
+    var inp=document.createElement('input');
+    inp.className='fi'; inp.style.cssText='margin:0;flex:1';
+    inp.value=o; inp.placeholder='Option '+(i+1)+'...';
+    inp.oninput=function(){S.popts[i]=this.value;};
+    d.appendChild(inp);
+    if(S.popts.length>2){
+      var x=document.createElement('button');
+      x.textContent='x'; x.style.cssText='background:none;border:none;color:#dc2626;font-size:16px;cursor:pointer';
+      x.onclick=function(){S.popts.splice(i,1);renderPollOpts();};
+      d.appendChild(x);
+    }
+    list.appendChild(d);
+  });
+}
+
+function renderPollVis() {
+  var vc=document.getElementById('pvisChips');
+  if(!vc)return;
+  vc.innerHTML='';
+  GROUPS.forEach(function(g){
+    var s=document.createElement('span');
+    s.className='vchip'+(S.vis.indexOf(g)>=0?' on':'');
+    s.textContent=g==='all'?'All Staff':g.charAt(0).toUpperCase()+g.slice(1);
+    s.onclick=function(){togVis(g);renderPollVis();};
+    vc.appendChild(s);
+  });
+}
+
+async function subPoll() {
+  var q=document.getElementById('pq').value.trim();
+  var opts=S.popts.filter(function(o){return o.trim();});
+  if(!q||opts.length<2){alert('Enter question and at least 2 options.');return;}
+  document.getElementById('plmsg').textContent='Launching...';
+  var votes={};opts.forEach(function(o){votes[o]=0;});
+  await fsAdd('updates',{type:'poll',question:q,options:opts,votes:votes,visibility:S.vis.slice(),votedBy:[],createdAt:new Date().toISOString()});
+  toast('Poll launched!'); S.popts=['','']; S.vis=['all'];
+  await loadData(); goTo('feed');
+}
+
+async function renderAssocsPg(m) {
+  S.assocs = await fsGet('associates');
+  m.innerHTML='<div class="card"><h3>Add New Associate</h3>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
+    '<input class="fi" id="nid" placeholder="Employee ID" style="flex:1;min-width:120px;margin:0"/>'+
+    '<input class="fi" id="nnm" placeholder="Full Name" style="flex:1;min-width:120px;margin:0"/></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;margin-top:8px">'+
+    '<input class="fi" id="npw" placeholder="Password" style="flex:1;min-width:120px;margin:0"/><select class="fi" id="ngnd" style="flex:1;margin:0"><option value="">Select Gender</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>'+
+    '<select class="fi" id="nrl" style="flex:1;margin:0"><option value="associate">Associate</option><option value="manager">Manager</option><option value="flash">Flash</option></select>'+
+    '<select class="fi" id="ngp" style="flex:1;margin:0">'+
+    GROUPS.filter(function(g){return g!=='all';}).map(function(g){return '<option value="'+g+'">'+g.charAt(0).toUpperCase()+g.slice(1)+'</option>';}).join('')+
+    '</select></div>'+
+    '<button class="gb" id="addABtn">+ Add Associate</button>'+
+    '<span id="amsg" style="margin-left:10px;font-size:13px;color:#059669"></span></div>'+
+    '<div class="card"><h3>All Associates ('+S.assocs.length+')</h3>'+
+    (S.assocs.length===0?'<div class="empty">No associates yet.</div>':
+    '<div id="alist">'+S.assocs.map(function(a){
+      return '<div class="ar">'+
+        '<div class="aid">'+esc(a.id)+'</div>'+
+        '<div class="an">'+esc(a.name)+' <span style="color:#999;font-size:10px">'+(a.gender||'')+'</span></div>'+
+        '<span class="sb '+(a.status==='active'?'sa':'si')+'">'+a.status+'</span>'+
+        '<button class="sm2 togBtn" data-fid="'+a.fid+'" data-ns="'+(a.status==='active'?'inactive':'active')+'" style="'+(a.status==='active'?'':'color:#059669')+'">'+(a.status==='active'?'Deactivate':'Reactivate')+'</button>'+
+        '<button class="sm2 delABtn" data-fid="'+a.fid+'" style="color:#dc2626">Delete</button>'+
+        '</div>';
+    }).join('')+'</div>')+
+    '</div>';
+
+  document.getElementById('addABtn').onclick=addAssoc;
+  m.querySelectorAll('.togBtn').forEach(function(b){
+    b.onclick=function(){togSt(this.dataset.fid,this.dataset.ns);};
+  });
+  m.querySelectorAll('.delABtn').forEach(function(b){
+    b.onclick=function(){remA(this.dataset.fid);};
+  });
+}
+
+async function addAssoc() {
+  var id=document.getElementById('nid').value.trim().toUpperCase();
+  var name=document.getElementById('nnm').value.trim();
+  var pwd=document.getElementById('npw').value.trim();
+  var role=document.getElementById('nrl').value;
+  var group=document.getElementById('ngp').value;
+  var gender=document.getElementById('ngnd').value;
+  if(!id||!name||!pwd){alert('Fill all fields.');return;}
+  if(S.assocs.find(function(a){return a.id===id;})){alert('ID already exists.');return;}
+  document.getElementById('amsg').textContent='Adding...';
+  await fsAdd('associates',{id:id,name:name,password:pwd,role:role,group:group,gender:gender,status:'active',createdAt:new Date().toISOString()});
+  toast('Associate added!');
+  await renderAssocsPg(document.getElementById('main'));
+}
+
+async function togSt(fid,ns) {
+  await fsPatch('associates',fid,{status:ns});
+  toast(ns==='active'?'Reactivated!':'Deactivated!');
+  await renderAssocsPg(document.getElementById('main'));
+}
+
+async function remA(fid) {
+  if(!confirm('Delete permanently?'))return;
+  await fsDel('associates',fid);
+  toast('Removed!');
+  await renderAssocsPg(document.getElementById('main'));
+}
+
+async function fsGet(col) {
+  try{
+    var r=await fetch(BASE+col+'?key='+APIKEY+'&pageSize=200');
+    var d=await r.json();
+    if(!d.documents)return[];
+    return d.documents.map(function(doc){return Object.assign({fid:doc.name.split('/').pop()},parseDoc(doc.fields));});
+  }catch(e){console.error(e);return[];}
+}
+
+async function fsAdd(col,obj) {
+  try{await fetch(BASE+col+'?key='+APIKEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toF(obj)})});}
+  catch(e){console.error(e);}
+}
+
+async function fsPatch(col,id,obj) {
+  try{
+    var fields=toF(obj);
+    var mask=Object.keys(fields).map(function(k){return 'updateMask.fieldPaths='+k;}).join('&');
+    await fetch(BASE+col+'/'+id+'?key='+APIKEY+'&'+mask,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fields})});
+  }catch(e){console.error(e);}
+}
+
+async function fsDel(col,id) {
+  try{await fetch(BASE+col+'/'+id+'?key='+APIKEY,{method:'DELETE'});}catch(e){console.error(e);}
+}
+
+function toF(obj) {
+  var f={};
+  Object.keys(obj).forEach(function(k){
+    var v=obj[k];
+    if(v===null||v===undefined)f[k]={nullValue:null};
+    else if(Array.isArray(v))f[k]={arrayValue:{values:v.map(function(i){return{stringValue:String(i)};})}};
+    else if(typeof v==='object')f[k]={mapValue:{fields:toF(v)}};
+    else if(typeof v==='number')f[k]={integerValue:String(v)};
+    else if(typeof v==='boolean')f[k]={booleanValue:v};
+    else f[k]={stringValue:String(v)};
+  });
+  return f;
+}
+
+function parseDoc(fields) {
+  if(!fields)return{};
+  var obj={};
+  Object.keys(fields).forEach(function(k){
+    var v=fields[k];
+    if('stringValue'in v)obj[k]=v.stringValue;
+    else if('integerValue'in v)obj[k]=parseInt(v.integerValue);
+    else if('booleanValue'in v)obj[k]=v.booleanValue;
+    else if('arrayValue'in v)obj[k]=(v.arrayValue.values||[]).map(function(i){return i.stringValue||String(i.integerValue||'');});
+    else if('mapValue'in v)obj[k]=parseDoc(v.mapValue.fields);
+    else if('timestampValue'in v)obj[k]=v.timestampValue;
+  });
+  return obj;
+}
+
+function fmt(ts){if(!ts)return'';try{return new Date(ts).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}catch(e){return'';}}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none';},3000);}
+</script>
+</body>
+</html>
