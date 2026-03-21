@@ -361,7 +361,7 @@ function makeUpdate(u, isHR) {
     '<div class="utop"><span class="utag '+tc+'">'+(u.tag||'general')+'</span>'+
     (isHR ? '<button class="sm2 delBtn" style="color:#dc2626" data-id="'+u.fid+'">Delete</button>' : '')+
     '</div><div class="ut">'+esc(u.title||'')+'</div>'+
-    '<div class="ub">'+esc(u.body||'')+'</div>'+img+
+    '<div class="ub">'+escBold(u.body||'')+'</div>'+img+
     '<div class="uf"><span>By '+(u.author||'HR')+'</span><span>'+fmt(u.createdAt)+'</span></div></div>';
 }
 function makePoll(p, isHR) {
@@ -630,6 +630,9 @@ async function renderAssocsPg(m) {
     GROUPS.filter(function(g) { return g !== 'all'; }).map(function(g) { return '<option value="'+g+'">'+g.charAt(0).toUpperCase()+g.slice(1)+'</option>'; }).join('')+
     '</select></div>'+
 
+    '<label class="lbl">Photo (optional)</label>'+
+    '<input type="file" id="nphoto" accept="image/*" style="width:100%;padding:8px;border:1.5px dashed #e5e7eb;border-radius:8px;font-size:13px;margin-bottom:9px;cursor:pointer"/>'+
+    '<div id="nPhotoPreview" style="margin-bottom:9px"></div>'+
     '<button class="gb" id="addABtn">+ Add Associate</button>'+
   '<button class="gb" id="bulkBtn" style="background:#2563eb;margin-left:8px">📤 Bulk Upload</button>'+
   '<button class="gb" id="dlAssocBtn" style="background:#7c3aed;margin-left:8px">⬇ Download Associates</button>'+
@@ -639,8 +642,10 @@ async function renderAssocsPg(m) {
     (S.assocs.length === 0 ? '<div class="empty">No associates yet.</div>' :
     S.assocs.map(function(a) {
       return '<div class="ar">'+
-        '<div class="aid">'+esc(a.id)+'</div>'+
-        '<div class="an">'+esc(a.name)+' <span style="color:#999;font-size:10px">'+(a.gender||'')+( a.dob ? ' | '+a.dob : '')+'</span></div>'+
+        '<div style="display:flex;align-items:center;gap:8px">'+
+        (a.photo ? '<img src="'+a.photo+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid #e5e7eb;flex-shrink:0"/>' : '<div style="width:34px;height:34px;border-radius:50%;background:#e0e7ff;color:#3730a3;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">'+(a.name||'?')[0].toUpperCase()+'</div>')+
+        '<div><div class="aid">'+esc(a.id)+'</div>'+
+        '<div class="an">'+esc(a.name)+' <span style="color:#999;font-size:10px">'+(a.gender||'')+( a.dob ? ' | '+a.dob : '')+'</span></div></div></div>'+
         '<span class="sb '+(a.status==='active'?'sa':'si')+'">'+a.status+'</span>'+
         (a.status==='active' ? '<button class="sm2 togBtn" data-fid="'+a.fid+'" data-ns="inactive">Deactivate</button>' : '<button class="sm2 togBtn" data-fid="'+a.fid+'" data-ns="active" style="color:#059669">Reactivate</button>')+
         '<button class="sm2 pwdBtn" data-fid="'+a.fid+'" data-id="'+a.id+'" style="color:#2563eb">Change Pwd</button>'+
@@ -650,6 +655,17 @@ async function renderAssocsPg(m) {
     }).join(''))+
     '</div>';
   document.getElementById('addABtn').onclick = addAssoc;
+  document.getElementById('nphoto').onchange = function() {
+    var file = this.files[0];
+    var preview = document.getElementById('nPhotoPreview');
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        preview.innerHTML = '<img src="'+e.target.result+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb"/>';
+      };
+      reader.readAsDataURL(file);
+    } else { preview.innerHTML = ''; }
+  };
   document.getElementById('bulkBtn').onclick = showBulkUpload;
   document.getElementById('dlAssocBtn').onclick = downloadAssociates;
   document.getElementById('dlTemplate').onclick = function(e) { e.preventDefault(); downloadTemplate(); };
@@ -664,6 +680,7 @@ async function addAssoc() {
   var pwd = document.getElementById('npw').value.trim();
   var gender = document.getElementById('ngnd').value;
   var dob = document.getElementById('ndob').value;
+  var photoFile = document.getElementById('nphoto').files[0];
   var sq = 'What is your DOB?';
   var sa = dob; // DOB as answer e.g. 1995-08-14
   var role = document.getElementById('nrl').value;
@@ -671,9 +688,19 @@ async function addAssoc() {
   if (!id||!name||!pwd) { alert('Fill all fields.'); return; }
   if (S.assocs.find(function(a) { return a.id === id; })) { alert('ID already exists.'); return; }
   document.getElementById('amsg').textContent = 'Adding...';
-  await fsAdd('associates',{id:id,name:name,password:pwd,gender:gender,dob:dob,role:role,group:group,secretQuestion:sq,secretAnswer:sa,status:'active',createdAt:new Date().toISOString()});
-  toast('Associate added!');
-  await renderAssocsPg(document.getElementById('main'));
+  if (photoFile) {
+    compressImage(photoFile, async function(photoData) {
+      await fsAdd('associates',{id:id,name:name,password:pwd,gender:gender,dob:dob,role:role,group:group,secretQuestion:sq,secretAnswer:sa,photo:photoData,status:'active',createdAt:new Date().toISOString()});
+      toast('Associate added!');
+      document.getElementById('nphoto').value='';
+      document.getElementById('nPhotoPreview').innerHTML='';
+      await renderAssocsPg(document.getElementById('main'));
+    });
+  } else {
+    await fsAdd('associates',{id:id,name:name,password:pwd,gender:gender,dob:dob,role:role,group:group,secretQuestion:sq,secretAnswer:sa,photo:'',status:'active',createdAt:new Date().toISOString()});
+    toast('Associate added!');
+    await renderAssocsPg(document.getElementById('main'));
+  }
 }
 async function togSt(fid, ns) {
   await fsPatch('associates', fid, {status:ns});
@@ -1208,7 +1235,7 @@ async function renderAssocFeed(m) {
         (canDel ? '<button class="sm2 adelBtn" style="color:#dc2626" data-id="'+p.fid+'">Delete</button>' : '')+
         '</div>'+
         '<div class="ut">'+esc(p.title||'')+'</div>'+
-        '<div class="ub">'+esc(p.body||'')+'</div>'+img+
+        '<div class="ub">'+escBold(p.body||'')+'</div>'+img+
         '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9">'+reactionBtns+'</div>'+
         '<div class="cmtSec" style="margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9">'+
         renderComments(p)+
@@ -1583,6 +1610,9 @@ async function editAssoc(fid) {
     ['managers','sales','it','hr','operations'].map(function(g){ return '<option value="'+g+'"'+(a.group===g?' selected':'')+'>'+g.charAt(0).toUpperCase()+g.slice(1)+'</option>'; }).join('')+
     '</select>'+
 
+    '<label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;color:#666;margin-bottom:4px">Photo</label>'+
+    (a.photo ? '<img src="'+a.photo+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;margin-bottom:8px;display:block"/>' : '')+
+    '<input type="file" id="eaPhoto" accept="image/*" style="width:100%;padding:8px;border:1.5px dashed #e5e7eb;border-radius:8px;font-size:12px;margin-bottom:14px;cursor:pointer"/>'+
     '<div id="eaErr" style="color:#dc2626;font-size:12px;margin-bottom:10px;display:none"></div>'+
     '<div style="display:flex;gap:8px">'+
     '<button id="saveEditBtn" style="flex:1;padding:11px;background:#059669;border:none;border-radius:8px;color:white;font-size:14px;font-weight:700;cursor:pointer">Save Changes</button>'+
@@ -1604,10 +1634,20 @@ async function editAssoc(fid) {
     if (!id || !name) { errEl.textContent = 'Employee ID and Name are required.'; errEl.style.display='block'; return; }
     var btn = document.getElementById('saveEditBtn');
     btn.textContent = 'Saving...'; btn.disabled = true;
-    await fsPatch('associates', fid, {id:id, name:name, gender:gnd, dob:dob, role:role, group:grp});
-    closeEditModal();
-    toast('Associate updated!');
-    await renderAssocsPg(document.getElementById('main'));
+    var photoFile2 = document.getElementById('eaPhoto').files[0];
+    if (photoFile2) {
+      compressImage(photoFile2, async function(photoData) {
+        await fsPatch('associates', fid, {id:id, name:name, gender:gnd, dob:dob, role:role, group:grp, photo:photoData});
+        closeEditModal();
+        toast('Associate updated!');
+        await renderAssocsPg(document.getElementById('main'));
+      });
+    } else {
+      await fsPatch('associates', fid, {id:id, name:name, gender:gnd, dob:dob, role:role, group:grp});
+      closeEditModal();
+      toast('Associate updated!');
+      await renderAssocsPg(document.getElementById('main'));
+    }
   };
 }
 
@@ -1697,12 +1737,22 @@ async function checkAndPostBirthdays() {
     var title = '🎂 Birthday Wishes!';
     var body = '';
     if (names.length === 1) {
-      body = 'Wishing ' + names[0] + ' a very Happy Birthday! 🎉🎈\n\nMay your day be filled with joy and happiness. The entire team wishes you a wonderful birthday!';
+      body = 'Wishing **' + names[0] + '** a very Happy Birthday! 🎉🎈\n\nMay your day be filled with joy and happiness. The entire MINUTES team wishes you a wonderful birthday!';
     } else {
       body = 'Wishing a very Happy Birthday to our wonderful team members:\n\n' +
-        names.map(function(n){ return '🎂 '+n; }).join('\n') +
+        names.map(function(n){ return '🎂 **'+n+'**'; }).join('\n') +
         '\n\nMay this special day bring you all lots of joy and happiness! 🎉🎈';
     }
+
+    // Random birthday image from Pixabay (free)
+    var bdayImgs = [
+      'https://cdn.pixabay.com/photo/2017/07/21/23/57/birthday-2527765_640.jpg',
+      'https://cdn.pixabay.com/photo/2016/11/22/19/17/birthday-1850116_640.jpg',
+      'https://cdn.pixabay.com/photo/2019/07/29/07/54/birthday-4369145_640.jpg',
+      'https://cdn.pixabay.com/photo/2018/03/31/06/31/birthday-3279125_640.jpg',
+      'https://cdn.pixabay.com/photo/2020/02/05/09/32/birthday-4820882_640.jpg'
+    ];
+    var bdayImage = bdayImgs[Math.floor(Math.random() * bdayImgs.length)];
 
     // Post to HR updates with tag 'birthday'
     await fsAdd('updates', {
@@ -1712,7 +1762,7 @@ async function checkAndPostBirthdays() {
       tag: 'birthday',
       visibility: ['managers','sales','it','hr','operations'],
       author: 'Vendor Partner',
-      image: '',
+      image: bdayImage,
       createdAt: new Date().toISOString()
     });
 
@@ -1734,6 +1784,9 @@ async function checkAndPostBirthdays() {
 // UTILS
 function fmt(ts) { if (!ts) return ''; try { return new Date(ts).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e) { return ''; } }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escBold(s) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,'<br>');
+}
 function toast(m) { var t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 3000); }
 
 </script>
