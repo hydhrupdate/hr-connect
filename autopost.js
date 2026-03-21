@@ -1,10 +1,10 @@
 // MINUTES HR Connect - Auto Post Script
 // Runs via GitHub Actions every day at 6 AM IST (12:30 AM UTC)
-
+ 
 const PROJECT = 'hr-connect-3c286';
 const APIKEY = 'AIzaSyA-5I3dKQnFaYF0I1tOUyYcRP-mhgEBlW0';
 const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/`;
-
+ 
 // ─── HOLIDAYS ───────────────────────────────────────────────
 const HOLIDAYS = [
   { date: '03-19', name: 'Ugadi',                emoji: '🌸', msg: 'Wishing everyone a Happy Ugadi! May this Telugu New Year bring joy, prosperity and good health to you and your family.' },
@@ -16,7 +16,7 @@ const HOLIDAYS = [
   { date: '10-20', name: 'Vijaya Dasami',          emoji: '⚔️', msg: 'Happy Vijaya Dasami! May the victory of good over evil inspire us to overcome challenges and achieve success in all our endeavors.' },
   { date: '11-08', name: 'Deepavali',              emoji: '🪔', msg: 'Happy Deepavali! May the festival of lights fill your life with happiness, prosperity and peace. Wishing you and your family a bright and joyful Diwali!' },
 ];
-
+ 
 // ─── HELPERS ────────────────────────────────────────────────
 async function fsGet(col) {
   const r = await fetch(`${BASE}${col}?key=${APIKEY}&pageSize=300`);
@@ -34,7 +34,7 @@ async function fsGet(col) {
     return obj;
   });
 }
-
+ 
 async function fsAdd(col, obj) {
   const fields = {};
   Object.keys(obj).forEach(k => {
@@ -51,7 +51,7 @@ async function fsAdd(col, obj) {
   if (d.error) throw new Error(d.error.message);
   return d;
 }
-
+ 
 // ─── MAIN ───────────────────────────────────────────────────
 async function main() {
   const now = new Date();
@@ -59,14 +59,14 @@ async function main() {
   const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
   const todayDate = ist.toISOString().slice(0, 10); // YYYY-MM-DD
   const todayMD = ist.toISOString().slice(5, 10);   // MM-DD
-
+ 
   console.log(`Running auto-post for IST date: ${todayDate} (MM-DD: ${todayMD})`);
-
+ 
   // Fetch existing updates to avoid duplicate posts
   const updates = await fsGet('updates');
   const todayPosts = updates.filter(u => u.createdAt && u.createdAt.slice(0, 10) === todayDate);
   const todayTags = todayPosts.map(u => u.tag);
-
+ 
   // ── 1. HOLIDAY CHECK ──────────────────────────────────────
   const holiday = HOLIDAYS.find(h => h.date === todayMD);
   if (holiday) {
@@ -89,14 +89,24 @@ async function main() {
   } else {
     console.log(`No holiday today (${todayMD}).`);
   }
-
+ 
   // ── 2. BIRTHDAY CHECK ─────────────────────────────────────
   const alreadyBdayPosted = todayTags.includes('birthday');
   if (alreadyBdayPosted) {
     console.log('Birthday post already exists today. Skipping.');
   } else {
     const assocs = await fsGet('associates');
-    const bdays = assocs.filter(a => {
+    // Random birthday wish images (free to use)
+  const bdayImages = [
+    'https://cdn.pixabay.com/photo/2017/07/21/23/57/birthday-2527765_640.jpg',
+    'https://cdn.pixabay.com/photo/2016/11/22/19/17/birthday-1850116_640.jpg',
+    'https://cdn.pixabay.com/photo/2019/07/29/07/54/birthday-4369145_640.jpg',
+    'https://cdn.pixabay.com/photo/2018/03/31/06/31/birthday-3279125_640.jpg',
+    'https://cdn.pixabay.com/photo/2020/02/05/09/32/birthday-4820882_640.jpg'
+  ];
+  const randomImage = bdayImages[Math.floor(Math.random() * bdayImages.length)];
+ 
+  const bdays = assocs.filter(a => {
       if (!a.dob || a.status !== 'active') return false;
       const parts = a.dob.split('-');
       if (parts.length < 3) return false;
@@ -106,21 +116,24 @@ async function main() {
       else { dd = parts[0]; mm = parts[1]; }
       return `${mm.padStart(2,'0')}-${dd.padStart(2,'0')}` === todayMD;
     });
-
+ 
     if (bdays.length > 0) {
       const names = bdays.map(a => a.name);
       const title = '🎂 Birthday Wishes!';
       const body = names.length === 1
-        ? `Wishing ${names[0]} a very Happy Birthday! 🎉🎈\n\nMay your day be filled with joy and happiness. The entire MINUTES team wishes you a wonderful birthday!`
-        : `Wishing a very Happy Birthday to our wonderful team members:\n\n${names.map(n => '🎂 ' + n).join('\n')}\n\nMay this special day bring you all lots of joy and happiness! 🎉🎈`;
-
+        ? `Wishing **${names[0]}** a very Happy Birthday! 🎉🎈\n\nMay your day be filled with joy and happiness. The entire MINUTES team wishes you a wonderful birthday!`
+        : `Wishing a very Happy Birthday to our wonderful team members:\n\n${names.map(n => '🎂 **' + n + '**').join('\n')}\n\nMay this special day bring you all lots of joy and happiness! 🎉🎈`;
+ 
+      // Use first birthday person's photo if available
+      const bdayImage = bdays.length === 1 && bdays[0].photo ? bdays[0].photo : '';
+ 
       await fsAdd('updates', {
         type: 'update',
         title,
         body,
         tag: 'birthday',
         author: 'Vendor Partner',
-        image: '',
+        image: randomImage,
         visibility: JSON.stringify(['managers', 'sales', 'it', 'hr', 'operations']),
         createdAt: ist.toISOString()
       });
@@ -129,8 +142,33 @@ async function main() {
       console.log('No birthdays today.');
     }
   }
-
+ 
+  // ── 3. DELETE OLD BIRTHDAY POSTS (older than 7 days) ────
+  console.log('Checking for old birthday posts to delete...');
+  const sevenDaysAgo = new Date(ist.getTime() - (7 * 24 * 60 * 60 * 1000));
+  const oldBdayPosts = updates.filter(u => {
+    if (u.tag !== 'birthday') return false;
+    if (!u.createdAt) return false;
+    return new Date(u.createdAt) < sevenDaysAgo;
+  });
+ 
+  if (oldBdayPosts.length === 0) {
+    console.log('No old birthday posts to delete.');
+  } else {
+    for (const post of oldBdayPosts) {
+      const delUrl = `${BASE}updates/${post.fid}?key=${APIKEY}`;
+      const r = await fetch(delUrl, { method: 'DELETE' });
+      if (r.ok) {
+        console.log(`✅ Deleted old birthday post: ${post.title} (${post.createdAt?.slice(0,10)})`);
+      } else {
+        console.log(`❌ Failed to delete post: ${post.fid}`);
+      }
+    }
+    console.log(`Deleted ${oldBdayPosts.length} old birthday post(s).`);
+  }
+ 
   console.log('Auto-post completed!');
 }
-
+ 
 main().catch(e => { console.error('Error:', e); process.exit(1); });
+ 
