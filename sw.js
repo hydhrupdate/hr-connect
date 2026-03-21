@@ -1,15 +1,33 @@
-// HR Connect Service Worker
-var CACHE_NAME = 'hr-connect-v1';
+var CACHE_NAME = 'hr-connect-v2';
+var CACHE_URLS = ['./','./index.html','./manifest.json'];
 
 self.addEventListener('install', function(e) {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(CACHE_URLS);
+    })
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.filter(function(k) { return k !== CACHE_NAME; }).map(function(k) { return caches.delete(k); }));
+    })
+  );
   e.waitUntil(clients.claim());
 });
 
-// Handle push notifications
+self.addEventListener('fetch', function(e) {
+  // Network first, fall back to cache
+  e.respondWith(
+    fetch(e.request).catch(function() {
+      return caches.match(e.request);
+    })
+  );
+});
+
 self.addEventListener('push', function(e) {
   var data = {};
   try { data = e.data.json(); } catch(err) { data = {title:'HR Connect', body: e.data ? e.data.text() : 'New update!'}; }
@@ -20,12 +38,11 @@ self.addEventListener('push', function(e) {
       badge: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
       tag: 'hr-update',
       requireInteraction: true,
-      data: { url: self.location.origin + self.location.pathname.replace('sw.js','') }
+      vibrate: [200, 100, 200]
     })
   );
 });
 
-// Click on notification opens the app
 self.addEventListener('notificationclick', function(e) {
   e.notification.close();
   e.waitUntil(
@@ -33,7 +50,7 @@ self.addEventListener('notificationclick', function(e) {
       for (var i = 0; i < list.length; i++) {
         if (list[i].url && 'focus' in list[i]) return list[i].focus();
       }
-      if (clients.openWindow) return clients.openWindow(e.notification.data.url || '/');
+      if (clients.openWindow) return clients.openWindow('./');
     })
   );
 });
